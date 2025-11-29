@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy Digital Solutions - Веб-разработка</title>
+    <style>
+        /* 1. Стили для ФОНА (который затемняет все вокруг) */
+        #welcome-popup {
+            position: fixed; /* Фиксируем окно над всем контентом */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Темный полупрозрачный фон */
+            display: flex; /* Используем Flexbox для идеального центрирования */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Гарантируем, что окно будет поверх всего */
+            transition: opacity 0.3s ease;
+        }
+
+        /* 2. Стили для СОДЕРЖИМОГО окна */
+        .popup-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 80%;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 3. Классы для СКРЫТИЯ/ПОКАЗА */
+        .popup-hidden {
+            opacity: 0; /* Делаем невидимым */
+            pointer-events: none; /* Игнорируем клики, когда скрыто */
+        }
+
+        .popup-visible {
+            opacity: 1; /* Делаем видимым */
+            pointer-events: auto; /* Разрешаем клики, когда видимо */
+        }
+        /* Стили для минимализма и читаемости */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Плавный переход от более темного синего к более светлому */
+            background: linear-gradient(to bottom right, #001f4d, #007bff);
+            color: #333;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Новый стиль для Хедер-блока */
+        .site-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding-bottom: 20px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 700px;
+            padding: 40px;
+            /* НОВЫЕ СВОЙСТВА ДЛЯ ЦЕНТРИРОВАНИЯ: */
+            display: flex; /* Делаем контейнер гибким */
+            flex-direction: column; /* Располагаем элементы вертикально */
+            align-items: center; /* ЦЕНТРИРУЕМ ВСЕ ДОЧЕРНИЕ ЭЛЕМЕНТЫ (h1, p, ul) ПО ГОРИЗОНТАЛИ */
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Начальная тень */
+            border-radius: 20px;
+            color: #333;
+            text-align: center; /* ГОВОРИМ контейнеру центрировать текст и строчные элементы */
+            transition: box-shadow 0.3s ease, transform 0.3s ease; /* Добавляем плавность для тени! */
+        }
+           /* ЭТО НОВЫЙ БЛОК, который срабатывает только при наведении */
+        .container:hover {
+             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+             transform: translateY(-5px);
+             cursor: pointer;
+        }
+
+        h1 {
+            color: #007BFF;
+            margin-bottom: 0;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            color: #666;
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        /* Новый стиль для изображения */
+        .header-logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 15px;
+            border-radius: 50%;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            /* УДАЛЯЕМ: width: 85%; */
+            /* УДАЛЯЕМ: margin: 20px auto; */
+            margin: 20px 0; /* Оставляем только вертикальный отступ */
+        }
+        li {
+            margin-bottom: 10px;
+            padding-left: 0;
+            position: relative;
+        }
+
+            li::before {
+                content: '✓';
+                color: #28a745;
+                font-weight: bold;
+                display: inline-block;
+                width: 1em;
+                margin-left: -1em;
+            }
+
+        .footer {
+            margin-top: 50px;
+            font-size: 0.9em;
+            color: #999;
+        }
+
+            .footer p {
+                margin-bottom: 5px; /* Уменьшаем отступ между строками футера */
+            }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .menu-button {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.5s ease;
+        }
+
+            .menu-button:hover {
+                background-color: #1e7e34;
+            }
+        p {
+            max-width: 90%; /* Ограничиваем ширину */
+            margin: 10px auto; /* Центрируем параграф */
+        }
+    </style>
+</head>
+<body>
+    <div id="welcome-popup" class="popup-hidden">
+        <div class="popup-content">
+            <h2>👋 Добро пожаловать!</h2>
+            <p>Мы рады, что вы заглянули на обновляемую страницу Synergy Digital Solutions.</p>
+            <button onclick="closePopup()">Продолжить</button>
+        </div>
+    </div>
+    <div class="container">
+        <div class="site-header">
+            <img src="logo.png" alt="Логотип компании" class="header-logo">
+            <h1>Synergy Digital Solutions</h1>
+            <h2>Мы создаем цифровые решения для вашего бизнеса</h2>
+        </div>
+
+        <p>Наш сайт находится в процессе обновления, но мы работаем над:</p>
+
+        <ul>
+            <li>Разработкой современных адаптивных веб-сайтов.</li>
+            <li>Мобильными приложениями для iOS и Android.</li>
+            <li>SEO-оптимизацией и продвижением в поисковых системах.</li>
+            <li>Облачными решениями и поддержкой IT-инфраструктуры.</li>
+        </ul>
+
+        <a href="services.html" class="menu-button">Наши другие услуги</a>
+
+        <div class="footer">
+            <p>Чтобы обсудить ваш проект, свяжитесь с нами по электронной почте:</p>
+            <p>Email: <a href="mailto:info@synergyds.com">info@synergyds.com</a> | Телефон: +7 (495) 580-45-67</p>
+            <p>© 2024 Synergy Digital Solutions</p>
+        </div>
+    </div>
+    <script>
+        const popup = document.getElementById('welcome-popup');
+
+        // Функция, которая показывает окно
+        function showPopup() {
+            // --- НОВЫЙ КОД ПРОВЕРКИ ---
+            // 1. Проверяем, существует ли в памяти браузера метка 'popup_shown'
+            if (sessionStorage.getItem('popup_shown') === 'true') {
+                // Если метка есть, просто выходим из функции и ничего не показываем
+                return;
+            }
+            // --------------------------
+
+            popup.classList.remove('popup-hidden');
+            popup.classList.add('popup-visible');
+        }
+
+        // Функция, которая скрывает окно
+        function closePopup() {
+            popup.classList.remove('popup-visible');
+            popup.classList.add('popup-hidden');
+
+            // --- НОВЫЙ КОД УСТАНОВКИ ФЛАГА ---
+            // 2. Устанавливаем метку в память браузера, что окно было показано
+            sessionStorage.setItem('popup_shown', 'true');
+            // ----------------------------------
+        }
+
+        // Вызываем функцию showPopup, как только страница полностью загружена
+        window.onload = showPopup;
+    </script>
+</body>
+</html>
