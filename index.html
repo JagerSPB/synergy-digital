@@ -188,7 +188,7 @@
         <ul>
             <li>Разработкой современных адаптивных веб-сайтов.</li>
             <li>Мобильными приложениями для iOS и Android.</li>
-            <li>SEO-оптимизацией и продвижением в поисковых системах.</li>
+            <li>Сетевыми технологиями.</li>
             <li>Облачными решениями и поддержкой IT-инфраструктуры.</li>
         </ul>
 
@@ -197,7 +197,7 @@
         <div class="footer">
             <p>Чтобы обсудить ваш проект, свяжитесь с нами по электронной почте:</p>
             <p>Email: <a href="mailto:info@synergyds.com">info@synergyds.com</a> | Телефон: +7 (495) 580-45-67</p>
-            <p>© 2024 Synergy Digital Solutions</p>
+            <p>© <span id="current-year"></span> Synergy Digital Solutions</p>
         </div>
     </div>
     <script>
@@ -227,9 +227,25 @@
             sessionStorage.setItem('popup_shown', 'true');
             // ----------------------------------
         }
+        // Функция для автоматического обновления года в футере
+        function updateYear() {
+            // 1. Получаем текущий год
+            const year = new Date().getFullYear();
 
-        // Вызываем функцию showPopup, как только страница полностью загружена
-        window.onload = showPopup;
+            // 2. Находим элемент по ID
+            const yearElement = document.getElementById('current-year');
+
+            // 3. Если элемент найден, вставляем в него текущий год
+            if (yearElement) {
+                yearElement.textContent = year;
+            }
+        }
+
+        // Вызываем эту функцию сразу после загрузки страницы
+        window.onload = function () {
+            showPopup(); // Показываем всплывающее окно
+            updateYear(); // Обновляем год
+        };
     </script>
 </body>
 </html>
