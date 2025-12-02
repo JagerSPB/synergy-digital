@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Наши Услуги - Synergy Digital Solutions</title>
     <style>
+        /* --- СТИЛИ ДЛЯ CANVAS (АНИМАЦИИ) --- */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* На заднем плане */
+            pointer-events: none; /* Пропускаем клики сквозь холст */
+        }
+
         /* Мы скопировали стили из index.html, чтобы дизайн был одинаковым! */
         body {
             font-family: Arial, sans-serif;
@@ -18,6 +29,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            position: relative; /* Важно для z-index */
         }
 
         .container {
@@ -28,6 +40,8 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             color: #333;
+            position: relative; /* Важно! Чтобы контейнер был ПОВЕРХ частиц */
+            z-index: 1;
         }
 
         h1 {
@@ -89,6 +103,9 @@
     </style>
 </head>
 <body>
+    <!-- Холст для анимации -->
+    <canvas id="particleCanvas"></canvas>
+
     <div class="container">
         <h1>Наши основные услуги</h1>
         <h2>Мы предлагаем комплексный подход к цифровизации</h2>
@@ -109,5 +126,125 @@
             <p>Email: <a href="mailto:sales@synergyds.com">sales@synergyds.com</a></p>
         </div>
     </div>
+
+    <script>
+        // --- ЛОГИКА CANVAS (АНИМАЦИЯ) ---
+        // Точная копия скрипта с главной страницы для единства стиля
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particlesArray;
+
+        // Отслеживание мыши
+        let mouse = {
+            x: null,
+            y: null,
+            radius: 150
+        }
+
+        window.addEventListener('mousemove', function(event) {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        window.addEventListener('touchstart', (e) => {
+            mouse.x = e.touches[0].clientX;
+            mouse.y = e.touches[0].clientY;
+        });
+        window.addEventListener('touchmove', (e) => {
+            mouse.x = e.touches[0].clientX;
+            mouse.y = e.touches[0].clientY;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() * 2) - 1.0;
+                this.speedY = (Math.random() * 2) - 1.0;
+                this.color = 'rgba(255, 255, 255, 0.7)';
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > height || this.y < 0) this.speedY = -this.speedY;
+
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+
+                if (distance < mouse.radius && mouse.x != null) {
+                    if (mouse.x < this.x && this.x < width - 10) this.x += 3;
+                    if (mouse.x > this.x && this.x > 10) this.x -= 3;
+                    if (mouse.y < this.y && this.y < height - 10) this.y += 3;
+                    if (mouse.y > this.y && this.y > 10) this.y -= 3;
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (width * height) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                connect(particlesArray[i], particlesArray);
+            }
+        }
+
+        function connect(currentParticle, particles) {
+            for (let j = 0; j < particles.length; j++) {
+                let distance = ((currentParticle.x - particles[j].x) * (currentParticle.x - particles[j].x))
+                + ((currentParticle.y - particles[j].y) * (currentParticle.y - particles[j].y));
+
+                if (distance < (width/7) * (height/7)) {
+                    let opacityValue = 1 - (distance/10000);
+                    ctx.strokeStyle = 'rgba(255, 255, 255,' + opacityValue + ')';
+                    ctx.lineWidth = 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(currentParticle.x, currentParticle.y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        window.addEventListener('resize', function() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            init();
+        });
+
+        window.onload = function () {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            init();
+            animate();
+        };
+    </script>
 </body>
 </html>
